@@ -8,10 +8,14 @@ import (
 
 	"telegram/GeneralBot"
 
+	"github.com/icelain/jokeapi"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
+	joke := jokeapi.New()
+
 	bot, cfg := GeneralBot.LoadBot(".")
 
 	u := tgbotapi.NewUpdate(0)
@@ -24,7 +28,7 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 
 	// Pass cancellable context to goroutine
-	go receiveUpdates(ctx, updates, cfg, bot)
+	go receiveUpdates(ctx, updates, cfg, bot, joke)
 
 	// Tell the user the bot is online
 	log.Println("Start listening for updates. Press enter to stop")

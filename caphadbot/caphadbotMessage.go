@@ -6,9 +6,11 @@ import (
 	"telegram/GeneralBot"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
+	"github.com/icelain/jokeapi"
 )
 
-func handleMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI, cfg GeneralBot.Config) (msg tgbotapi.MessageConfig) {
+func handleMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI, cfg GeneralBot.Config, joke *jokeapi.JokeAPI) (msg tgbotapi.MessageConfig) {
 	user := message.From
 
 	if user == nil {
@@ -18,7 +20,7 @@ func handleMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI, cfg GeneralB
 	msg = tgbotapi.NewMessage(message.Chat.ID, "")
 
 	if message.IsCommand() {
-		msg.Text = handleCommand(message.Command(), bot, cfg)
+		msg.Text = handleCommand(message.Command(), bot, cfg, joke)
 	} else {
 		text := message.Text
 		msg.Text = "Sorry not sorry :" + text
@@ -31,7 +33,7 @@ func handleButton(query *tgbotapi.CallbackQuery) {
 	// unused, plan in the futur
 }
 
-func handleInline(inline *tgbotapi.InlineQuery, bot *tgbotapi.BotAPI, cfg GeneralBot.Config) (inlineConf tgbotapi.InlineConfig) {
+func handleInline(inline *tgbotapi.InlineQuery, bot *tgbotapi.BotAPI, cfg GeneralBot.Config, joke *jokeapi.JokeAPI) (inlineConf tgbotapi.InlineConfig) {
 	user := inline.From
 
 	if user == nil {
@@ -43,6 +45,11 @@ func handleInline(inline *tgbotapi.InlineQuery, bot *tgbotapi.BotAPI, cfg Genera
 	case strings.HasPrefix("insult", inline.Query):
 		article = tgbotapi.NewInlineQueryResultArticle(inline.ID, "Insult", insulted())
 		article.Description = "Random insult"
+		break
+
+	case strings.HasPrefix("joke", inline.Query):
+		article = tgbotapi.NewInlineQueryResultArticle(inline.ID, "Joke", joking(joke))
+		article.Description = "Random joke"
 		break
 
 	case strings.HasPrefix("help", inline.Query):
@@ -66,7 +73,7 @@ func handleInline(inline *tgbotapi.InlineQuery, bot *tgbotapi.BotAPI, cfg Genera
 	return inlineConf
 }
 
-func handleCommand(command string, bot *tgbotapi.BotAPI, cfg GeneralBot.Config) (msg string) {
+func handleCommand(command string, bot *tgbotapi.BotAPI, cfg GeneralBot.Config, joke *jokeapi.JokeAPI) (msg string) {
 	switch command {
 	case "start":
 		return "start msg"
@@ -76,6 +83,9 @@ func handleCommand(command string, bot *tgbotapi.BotAPI, cfg GeneralBot.Config) 
 
 	case "insult":
 		return insulted()
+
+	case "joke":
+		return joking(joke)
 
 	default:
 		return "Unknown command"
