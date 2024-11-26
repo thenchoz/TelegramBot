@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bufio"
-	"context"
 	"log"
-	"os"
-
+	"sync"
 	"telegram/GeneralBot"
 
 	"github.com/icelain/jokeapi"
@@ -21,19 +18,19 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	// Create a new cancellable background context. Calling `cancel()` leads to the cancellation of the context
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-
+	var wg sync.WaitGroup
 	updates := bot.GetUpdatesChan(u)
 
-	// Pass cancellable context to goroutine
-	go receiveUpdates(ctx, updates, cfg, bot, joke)
+	for update := range updates {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			err := handleUpdate(update, bot, cfg, joke)
+			if err != nil {
+				log.Printf("An error occured: %s", err.Error())
+			}
+		}()
+	}
 
-	// Tell the user the bot is online
-	log.Println("Start listening for updates. Press enter to stop")
-
-	// Wait for a newline symbol, then cancel handling updates
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	cancel()
+	wg.Wait()
 }
