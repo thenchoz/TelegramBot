@@ -10,21 +10,34 @@ import (
 	"github.com/icelain/jokeapi"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
+	"github.com/thenchoz/goHPapi"
 )
 
-func main() {
-	joke := jokeapi.New()
+type myBot struct {
+	tgBot *tgbotapi.BotAPI
+	joke  *jokeapi.JokeAPI
+	hpAPI *goHPapi.HPapi
+}
 
-	bot, cfg, err := GeneralBot.LoadBot(".")
+func main() {
+
+	tgbot, cfg, err := GeneralBot.LoadBot(".")
 	if err != nil {
 		log.Panic(err)
+	}
+
+	bot := myBot{
+		tgBot: tgbot,
+		joke:  jokeapi.New(),
+		hpAPI: goHPapi.New(),
 	}
 
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	var wg sync.WaitGroup
-	updates := bot.GetUpdatesChan(u)
+	updates := bot.tgBot.GetUpdatesChan(u)
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "cfg", cfg)
@@ -40,7 +53,7 @@ func main() {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				end, err := handleUpdate(ctx, update, bot, joke)
+				end, err := handleUpdate(ctx, update, &bot)
 				if err != nil {
 					log.Printf("An error occured: %s", err.Error())
 				}

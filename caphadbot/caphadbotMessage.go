@@ -4,15 +4,12 @@ import (
 	"context"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-
-	"github.com/icelain/jokeapi"
 )
 
 func handleMessage(
 	ctx context.Context,
 	message *tgbotapi.Message,
-	bot *tgbotapi.BotAPI,
-	joke *jokeapi.JokeAPI,
+	bot *myBot,
 ) (
 	msg tgbotapi.MessageConfig,
 	end bool,
@@ -30,7 +27,7 @@ func handleMessage(
 	ctx = context.WithValue(ctx, "lang", user.LanguageCode)
 
 	if message.IsCommand() {
-		msg.Text, end, err = handleCommand(ctx, message.Command(), user, bot, joke)
+		msg.Text, end, err = handleCommand(ctx, message.Command(), user, bot)
 	} else {
 		text := message.Text
 		msg.Text = "Sorry not sorry :" + text

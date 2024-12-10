@@ -5,15 +5,12 @@ import (
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-
-	"github.com/icelain/jokeapi"
 )
 
 func handleInline(
 	ctx context.Context,
 	inline *tgbotapi.InlineQuery,
-	bot *tgbotapi.BotAPI,
-	joke *jokeapi.JokeAPI,
+	bot *myBot,
 ) (
 	inlineConf tgbotapi.InlineConfig,
 	err error,
@@ -30,22 +27,27 @@ func handleInline(
 	switch {
 	case strings.HasPrefix("insult", inline.Query):
 		title = "Insult"
-		msg, _, err = handleCommand(ctx, "insult", user, bot, joke)
+		msg, _, err = handleCommand(ctx, "insult", user, bot)
 		description = "Random insult"
 
 	case strings.HasPrefix("joke", inline.Query):
 		title = "Joke"
-		msg, _, err = handleCommand(ctx, "joke", user, bot, joke)
+		msg, _, err = handleCommand(ctx, "joke", user, bot)
 		description = "Random joke"
 
 	case strings.HasPrefix("spell", inline.Query):
 		title = "Spell"
-		msg, _, err = handleCommand(ctx, "spell", user, bot, joke)
+		msg, _, err = handleCommand(ctx, "spell", user, bot)
 		description = "Random spell"
+
+	case strings.HasPrefix("spell_explained", inline.Query):
+		title = "Spell"
+		msg, _, err = handleCommand(ctx, "spell_explained", user, bot)
+		description = "Random spell explained"
 
 	case strings.HasPrefix("help", inline.Query):
 		title = "Helper"
-		msg, _, err = handleCommand(ctx, "help", user, bot, joke)
+		msg, _, err = handleCommand(ctx, "help", user, bot)
 		description = "Helper text"
 
 	default:

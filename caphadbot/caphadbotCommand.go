@@ -7,16 +7,13 @@ import (
 	"telegram/GeneralBot"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-
-	"github.com/icelain/jokeapi"
 )
 
 func handleCommand(
 	ctx context.Context,
 	command string,
 	user *tgbotapi.User,
-	bot *tgbotapi.BotAPI,
-	joke *jokeapi.JokeAPI,
+	bot *myBot,
 ) (
 	msg string,
 	end bool,
@@ -27,20 +24,23 @@ func handleCommand(
 
 	switch command {
 	case "start":
-		msg, err = GeneralBot.BotHelper(ctx, bot)
+		msg, err = GeneralBot.BotHelper(ctx, bot.tgBot)
 		msg = "Welcome " + user.UserName + "!\n" + msg
 
 	case "help":
-		msg, err = GeneralBot.BotHelper(ctx, bot)
+		msg, err = GeneralBot.BotHelper(ctx, bot.tgBot)
 
 	case "insult":
 		msg, err = insulted(ctx)
 
 	case "joke":
-		msg, err = joking(ctx, joke)
+		msg, err = joking(ctx, bot)
 
 	case "spell":
-		msg, err = spell(ctx)
+		msg, err = spell(ctx, bot, false)
+
+	case "spell_explained":
+		msg, err = spell(ctx, bot, true)
 
 	case "stop":
 		if cfg := ctx.Value("cfg"); cfg != nil {
