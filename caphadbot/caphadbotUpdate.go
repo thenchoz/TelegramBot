@@ -1,30 +1,45 @@
 package main
 
 import (
-	"telegram/GeneralBot"
+	"context"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
 	"github.com/icelain/jokeapi"
 )
 
-func handleUpdate(update tgbotapi.Update, bot *tgbotapi.BotAPI, cfg GeneralBot.Config, joke *jokeapi.JokeAPI) (err error) {
+func handleUpdate(
+	ctx context.Context,
+	update tgbotapi.Update,
+	bot *tgbotapi.BotAPI,
+	joke *jokeapi.JokeAPI,
+) (
+	ending bool,
+	err error,
+) {
+	// default value -> not ending call
+	ending = false
+
 	switch {
 	case update.Message != nil:
-		msg := handleMessage(update.Message, bot, cfg, joke)
+		var msg tgbotapi.MessageConfig
+		msg, ending, err = handleMessage(ctx, update.Message, bot, joke)
+		if err != nil {
+			return
+		}
 		_, err = bot.Send(msg)
-		return err
 
 	case update.CallbackQuery != nil:
-		handleButton(update.CallbackQuery)
-		return err
+		handleButton(ctx, update.CallbackQuery)
 
 	case update.InlineQuery != nil:
-		inline := handleInline(update.InlineQuery, bot, cfg, joke)
+		var inline tgbotapi.InlineConfig
+		inline, err = handleInline(ctx, update.InlineQuery, bot, joke)
+		if err != nil {
+			return
+		}
 		_, err = bot.Request(inline)
-		return err
-
-	default:
-		return err
 	}
+
+	return
 }

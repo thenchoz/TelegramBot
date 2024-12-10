@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"log"
 	"sync"
+
 	"telegram/GeneralBot"
 
 	"github.com/icelain/jokeapi"
@@ -13,7 +15,10 @@ import (
 func main() {
 	joke := jokeapi.New()
 
-	bot, cfg := GeneralBot.LoadBot(".")
+	bot, cfg, err := GeneralBot.LoadBot(".")
+	if err != nil {
+		log.Panic(err)
+	}
 
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -21,16 +26,29 @@ func main() {
 	var wg sync.WaitGroup
 	updates := bot.GetUpdatesChan(u)
 
-	for update := range updates {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			err := handleUpdate(update, bot, cfg, joke)
-			if err != nil {
-				log.Printf("An error occured: %s", err.Error())
-			}
-		}()
-	}
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "cfg", cfg)
+	ctx, cancel := context.WithCancel(ctx)
 
-	wg.Wait()
+	for {
+		select {
+		// stop looping if ctx is cancelled
+		case <-ctx.Done():
+			return
+		// receive update from channel and then handle it
+		case update := <-updates:
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				end, err := handleUpdate(ctx, update, bot, joke)
+				if err != nil {
+					log.Printf("An error occured: %s", err.Error())
+				}
+				if end {
+					cancel()
+					wg.Wait()
+				}
+			}()
+		}
+	}
 }
