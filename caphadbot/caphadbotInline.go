@@ -35,6 +35,11 @@ func handleInline(
 		msg, _, err = handleCommand(ctx, "joke", user, bot)
 		description = "Random joke"
 
+	case strings.HasPrefix("quote", inline.Query):
+		title = "Quote"
+		msg, _, err = handleCommand(ctx, "quote", user, bot)
+		description = "Random quote"
+
 	case strings.HasPrefix("spell", inline.Query):
 		title = "Spell"
 		msg, _, err = handleCommand(ctx, "spell", user, bot)

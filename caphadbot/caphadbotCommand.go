@@ -42,6 +42,9 @@ func handleCommand(
 	case "spell_explained":
 		msg, err = spell(ctx, bot, true)
 
+	case "quote":
+		msg, err = quote(ctx, bot)
+
 	case "stop":
 		if cfg := ctx.Value("cfg"); cfg != nil {
 			if cfg.(GeneralBot.Config).Admin_Id == user.ID {
