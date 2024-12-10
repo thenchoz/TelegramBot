@@ -51,7 +51,7 @@ func handleCommand(
 				msg = "Unauthorise"
 			}
 		} else {
-			err = errors.New("Admin ID not found")
+			err = errors.New("admin id not found")
 		}
 
 	default:
