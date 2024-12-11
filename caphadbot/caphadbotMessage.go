@@ -24,7 +24,6 @@ func handleMessage(
 	}
 
 	msg = tgbotapi.NewMessage(message.Chat.ID, "")
-	ctx = context.WithValue(ctx, "lang", user.LanguageCode)
 
 	if message.IsCommand() {
 		msg.Text, end, err = handleCommand(ctx, message.Command(), user, bot)

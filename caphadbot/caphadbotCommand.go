@@ -24,6 +24,7 @@ func handleCommand(
 
 	switch command {
 	case "start":
+		ctx := context.WithValue(ctx, "lang", user.LanguageCode)
 		msg, err = GeneralBot.BotHelper(ctx, bot.tgBot)
 		msg = "Welcome " + user.UserName + "!\n" + msg
 
@@ -40,7 +41,9 @@ func handleCommand(
 		msg, err = spell(ctx, bot, false)
 
 	case "spell_explained":
+		bot.hpAPI.SetLang(user.LanguageCode)
 		msg, err = spell(ctx, bot, true)
+		bot.hpAPI.Reset()
 
 	case "quote":
 		msg, err = quote(ctx, bot)

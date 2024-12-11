@@ -21,8 +21,6 @@ func handleInline(
 		return
 	}
 
-	ctx = context.WithValue(ctx, "lang", user.LanguageCode)
-
 	var msg, title, description string
 	switch {
 	case strings.HasPrefix("insult", inline.Query):
