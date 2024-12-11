@@ -31,7 +31,7 @@ func handleCommand(
 		msg, err = GeneralBot.BotHelper(ctx, bot.tgBot)
 
 	case "insult":
-		msg, err = insulted(ctx)
+		msg, err = insulted()
 
 	case "joke":
 		msg, err = joking(ctx, bot)

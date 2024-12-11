@@ -28,4 +28,4 @@ go.work.sum
 *.yaml
 
 # specific text
-caphadbotText.go
+caphadbotInsult.go
