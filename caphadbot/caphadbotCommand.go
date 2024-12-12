@@ -16,6 +16,7 @@ func handleCommand(
 	bot *myBot,
 ) (
 	msg string,
+	url string,
 	end bool,
 	err error,
 ) {
@@ -46,7 +47,7 @@ func handleCommand(
 		bot.hpAPI.Reset()
 
 	case "quote":
-		msg, err = quote(ctx, bot)
+		msg, url, err = quote(ctx, bot)
 
 	case "stop":
 		if cfg := ctx.Value("cfg"); cfg != nil {

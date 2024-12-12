@@ -11,7 +11,6 @@ func handleMessage(
 	message *tgbotapi.Message,
 	bot *myBot,
 ) (
-	msg tgbotapi.MessageConfig,
 	end bool,
 	err error,
 ) {
@@ -23,13 +22,24 @@ func handleMessage(
 		return
 	}
 
-	msg = tgbotapi.NewMessage(message.Chat.ID, "")
+	var msg, url string
 
 	if message.IsCommand() {
-		msg.Text, end, err = handleCommand(ctx, message.Command(), user, bot)
+		msg, url, end, err = handleCommand(ctx, message.Command(), user, bot)
+		if err != nil {
+			return
+		}
 	} else {
-		text := message.Text
-		msg.Text = "Sorry not sorry :" + text
+		msg = "Sorry not sorry :" + message.Text
+	}
+
+	if url != "" {
+		response := tgbotapi.NewPhoto(message.Chat.ID, tgbotapi.FileURL(url))
+		response.Caption = msg
+		_, err = bot.tgBot.Send(response)
+	} else {
+		response := tgbotapi.NewMessage(message.Chat.ID, msg)
+		_, err = bot.tgBot.Send(response)
 	}
 
 	return

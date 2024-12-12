@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
+	"strings"
 )
 
 func insulted() (insult string, err error) {
 	l := len(insults)
-	insult = insults[rand.Intn(l)]
+	insult = insults[rand.IntN(l)]
 	return
 }
 
@@ -36,11 +37,21 @@ func spell(ctx context.Context, bot *myBot, explained bool) (spell string, err e
 	return
 }
 
-func quote(ctx context.Context, bot *myBot) (quote string, err error) {
+func quote(ctx context.Context, bot *myBot) (quote string, url string, err error) {
 	q, err := bot.hpAPI.FetchQuote(ctx)
 	if err != nil {
 		return
 	}
-	quote = "\"" + q.Quote + "\"\n\n" + q.Speaker + ", in the " + q.Source + " \"" + q.Story + "\""
+	quote = "\"" + q.Quote + "\"\n\n" + "In the " + q.Source + " \"" + q.Story + "\""
+
+	// get character picture - looking only on surname
+	bot.hpAPI.SetSearch(strings.Split(q.Speaker, " ")[0])
+	c, err := bot.hpAPI.FetchCharacters(ctx)
+	if err != nil || len(c) == 0 {
+		quote += ", " + q.Speaker
+		return quote, url, nil
+	}
+
+	url = c[0].Image
 	return
 }
