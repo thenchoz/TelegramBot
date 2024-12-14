@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -43,8 +42,13 @@ func handleInline(
 			msg, _, _, err = handleCommand(ctx, "joke", user, bot)
 			description = "Random joke"
 
-		case strings.HasPrefix("quote", inline.Query):
+		case strings.HasPrefix("hpquote", inline.Query):
 			title = "Quote"
+			msg, url, _, err = handleCommand(ctx, "hpquote", user, bot)
+			description = "Random quote from Harry Potter"
+
+		case strings.HasPrefix("quote", inline.Query):
+			title = "Citation"
 			msg, url, _, err = handleCommand(ctx, "quote", user, bot)
 			description = "Random quote"
 
@@ -74,7 +78,7 @@ func handleInline(
 		}
 
 		id := inline.ID + strconv.Itoa(i)
-		article := tgbotapi.NewInlineQueryResultArticle(id, title, msg)
+		article := tgbotapi.NewInlineQueryResultArticleMarkdownV2(id, title, msg)
 		article.Description = description
 
 		inlineConf.Results = append(inlineConf.Results, article)
@@ -84,8 +88,7 @@ func handleInline(
 			photo.Caption = msg
 			photo.Description = description + " with picture"
 			photo.Title = title
-
-			fmt.Println(photo)
+			photo.ParseMode = "markdown"
 
 			inlineConf.Results = append(inlineConf.Results, photo)
 		}

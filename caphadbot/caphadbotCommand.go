@@ -30,10 +30,11 @@ func handleCommand(
 		msg = "Welcome " + user.UserName + "!\n" + msg
 
 	case "help":
+		ctx := context.WithValue(ctx, "lang", user.LanguageCode)
 		msg, err = GeneralBot.BotHelper(ctx, bot.tgBot)
 
 	case "insult":
-		msg, err = insulted()
+		msg, err = insulting()
 
 	case "joke":
 		msg, err = joking(ctx, bot)
@@ -46,8 +47,13 @@ func handleCommand(
 		msg, err = spell(ctx, bot, true)
 		bot.hpAPI.Reset()
 
+	case "hpquote":
+		bot.hpAPI.SetLang(user.LanguageCode)
+		msg, url, err = hpquote(ctx, bot)
+		bot.hpAPI.Reset()
+
 	case "quote":
-		msg, url, err = quote(ctx, bot)
+		msg, err = quote(ctx)
 
 	case "stop":
 		if cfg := ctx.Value("cfg"); cfg != nil {

@@ -36,9 +36,11 @@ func handleMessage(
 	if url != "" {
 		response := tgbotapi.NewPhoto(message.Chat.ID, tgbotapi.FileURL(url))
 		response.Caption = msg
+		response.ParseMode = "markdown"
 		_, err = bot.tgBot.Send(response)
 	} else {
 		response := tgbotapi.NewMessage(message.Chat.ID, msg)
+		response.ParseMode = "markdown"
 		_, err = bot.tgBot.Send(response)
 	}
 
