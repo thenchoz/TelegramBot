@@ -21,9 +21,6 @@ func handleUpdate(
 	case update.Message != nil:
 		ending, err = handleMessage(ctx, update.Message, bot)
 
-	case update.CallbackQuery != nil:
-		err = handleButton(ctx, update.CallbackQuery)
-
 	case update.InlineQuery != nil:
 		err = handleInline(ctx, update.InlineQuery, bot)
 	}
