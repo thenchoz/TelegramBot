@@ -75,7 +75,7 @@ func handleInline(
 	}
 
 	id := inline.ID
-	article := tgbotapi.NewInlineQueryResultArticleMarkdownV2(id, title, msg)
+	article := tgbotapi.NewInlineQueryResultArticleMarkdown(id, title, msg)
 	article.Description = description
 
 	inlineConf.Results = append(inlineConf.Results, article)
